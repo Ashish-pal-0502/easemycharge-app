@@ -7,7 +7,6 @@ import {
   Image,
 } from 'react-native';
 import MarketplaceCard from './../../components/Card/MarketplaceCard';
-
 import Battery from '../../assets/marketplace/battery.png';
 import Charger from '../../assets/marketplace/charger.png';
 import Back from '../../assets/welcome/backbutton.png';

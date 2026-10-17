@@ -1,7 +1,7 @@
 import React from 'react';
-import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
 import ScreenHeader from './../../components/ScreenHeader/ScreenHeader';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Image3 from '../../assets/threeWheelerManufacturer/euler.png';
 import Image4 from '../../assets/threeWheelerManufacturer/kineticgreen.png';
 import Image2 from '../../assets/threeWheelerManufacturer/mahindra.png';

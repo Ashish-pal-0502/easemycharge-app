@@ -1,11 +1,11 @@
 
+
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TextInput,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
 import React, {useState, useRef} from 'react';
@@ -14,6 +14,7 @@ import Continue from '../../assets/welcome/continue.png';
 import Back from '../../assets/welcome/backbutton.png';
 import {fonts} from './../../config/fonts';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 const OTP_LENGTH = 4;
 
@@ -28,7 +29,6 @@ const GetVerified = ({navigation}) => {
     newOtp[index] = digit;
     setOtp(newOtp);
 
-    // Auto-advance to next box
     if (digit && index < OTP_LENGTH - 1) {
       inputs.current[index + 1]?.focus();
     } else if (digit && index === OTP_LENGTH - 1) {
@@ -46,28 +46,28 @@ const GetVerified = ({navigation}) => {
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
+    <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtnWrapper}>
           <Image source={Back} style={styles.backButton} />
         </TouchableOpacity>
         <Image source={Logo} style={styles.logo} />
+        <View style={styles.backBtnWrapper} />
       </View>
-
-      <Text style={styles.headerText}>Let's get you verified</Text>
 
       <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollContainer}
-        resetScrollToCoords={{x: 0, y: 0}}
-        enableOnAndroid={true}
-        extraHeight={1}
+        showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled">
-        {/* OTP Section */}
+        
+        <Text style={styles.headerText}>Let's get you verified</Text>
+
         <View style={styles.otpContainer}>
           <Text style={styles.otpText}>
             Enter the OTP sent to{' '}
             <Text style={styles.otpTextNumber}>9999999999</Text>
           </Text>
+          
           <View style={styles.inputRow}>
             {otp.map((value, index) => (
               <TextInput
@@ -82,22 +82,26 @@ const GetVerified = ({navigation}) => {
               />
             ))}
           </View>
+
           <View style={styles.resendContainer}>
-            <Text style={styles.timerText}>Resend OTP</Text>
+            <Text style={styles.timerText}>Resend OTP in</Text>
             <Text style={styles.resendText}>00:21</Text>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.continueContainer}
-          onPress={() => navigation.navigate('GetStarted')}>
-          <Text style={styles.contButton}>CONTINUE</Text>
-          <Image source={Continue} style={styles.continue} />
-        </TouchableOpacity>
+        <View style={styles.bottomSection}>
+          <TouchableOpacity
+            style={styles.continueContainer}
+            onPress={() => navigation.replace('ChooseVehicle')}>
+            <Text style={styles.contButton}>CONTINUE</Text>
+            <Image source={Continue} style={styles.continue} />
+          </TouchableOpacity>
 
-        <Text style={styles.privacyTextFirst}>
-          Entered wrong number ? <Text style={styles.privacyText}>Change</Text>
-        </Text>
+          <Text style={styles.privacyTextFirst}>
+            Entered wrong number ? <Text style={styles.privacyText}>Change</Text>
+          </Text>
+        </View>
+
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
@@ -106,18 +110,20 @@ const GetVerified = ({navigation}) => {
 export default GetVerified;
 
 const styles = StyleSheet.create({
-  mainContainer: {
+  safeArea: {
     flex: 1,
-    justifyContent: 'start',
-    alignItems: 'center',
-    marginTop: 81,
+    backgroundColor: '#FFFFFF',
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
+    marginTop: 10,
+    height: 50,
+  },
+  backBtnWrapper: {
+    width: 42, 
   },
   backButton: {
     width: 20,
@@ -128,97 +134,106 @@ const styles = StyleSheet.create({
     width: 42,
     height: 49,
     resizeMode: 'contain',
-    position: 'absolute',
-    left: '54%',
-    transform: [{translateX: -21}],
+  },
+  scrollContainer: {
+    flexGrow: 1, 
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 30,
+    alignItems: 'center',
   },
   headerText: {
-    fontFamily: fonts.SemiBold,
-    fontSize: 36,
+    fontFamily: fonts.Bold,
+    fontSize: 32, 
+    color: '#000',
     textAlign: 'center',
-    marginTop: 20,
+    marginBottom: 40,
   },
   otpContainer: {
-    marginTop: 40,
-    width: '90%',
+    width: '100%',
     alignItems: 'center',
   },
   otpText: {
-    fontFamily: fonts.Medium,
-    fontSize: 20,
+    fontFamily: fonts.SemiBold,
+    fontSize: 16,
     color: '#000000',
     marginBottom: 20,
+    textAlign: 'center',
   },
   otpTextNumber: {
-    fontSize: 20,
-    fontFamily: fonts.Medium,
     color: '#1A9FEE',
   },
   inputRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
+    maxWidth: 340, 
+    alignSelf: 'center',
+    marginBottom: 20,
   },
   otpInput: {
-    width: 60,
-    height: 60,
-    backgroundColor: '#F2F2F2',
+    width: 65,
+    height: 65,
+    backgroundColor: '#F4F5F6', 
     textAlign: 'center',
     fontSize: 24,
-    marginHorizontal: 5,
-    borderWidth: 1.5,
-    borderColor: '#38B6FF',
-    borderRadius: 10,
     color: '#000000',
     paddingVertical: 0,
+    borderRadius: 2,
   },
   resendContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 20,
+    maxWidth: 340,
+    alignSelf: 'center',
   },
   timerText: {
-    fontSize: 16,
-    color: '#888D93',
+    fontFamily: fonts.Medium,
+    fontSize: 15,
+    color: '#676B89',
   },
   resendText: {
-    fontSize: 16,
-    color: '#1A9FEE',
     fontFamily: fonts.Bold,
+    fontSize: 15,
+    color: '#1A9FEE',
+  },
+  bottomSection: {
+    marginTop: 'auto',
+    width: '100%',
+    alignItems: 'center',
   },
   continueContainer: {
-    marginTop: 360,
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    borderWidth: 3,
-    borderColor: '#38B6FF',
-    padding: 20,
-    borderRadius: 100,
     justifyContent: 'center',
+    width: '100%',
+    maxWidth: 340,
+    borderWidth: 2,
+    borderColor: '#38B6FF',
+    paddingVertical: 16,
+    borderRadius: 100,
+    marginBottom: 20,
   },
   contButton: {
     fontFamily: fonts.Bold,
-    fontSize: 16,
+    fontSize: 14,
     color: '#000',
-    marginRight: 5,
+    marginRight: 8,
   },
   continue: {
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 18,
     resizeMode: 'contain',
   },
-  privacyText: {
-    marginTop: 20,
-    fontSize: 20,
-    fontFamily: fonts.SemiBold,
-    color: '#1A9FEE',
-  },
   privacyTextFirst: {
-    marginTop: 20,
-    fontSize: 20,
-    fontFamily: fonts.SemiBold,
+    fontFamily: fonts.Medium,
+    fontSize: 14,
     color: '#797981',
+    textAlign: 'center',
+  },
+  privacyText: {
+    color: '#1A9FEE',
+    fontFamily: fonts.SemiBold,
   },
 });

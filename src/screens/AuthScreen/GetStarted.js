@@ -1,13 +1,15 @@
+
+
 import {
   StyleSheet,
   Text,
   View,
   Image,
   TextInput,
-  SafeAreaView,
   TouchableOpacity,
   Alert,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 import React, {useState} from 'react';
 import Logo from '../../assets/logo/Logo.png';
 import Continue from '../../assets/welcome/continue.png';
@@ -16,20 +18,18 @@ import {fonts} from './../../config/fonts';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const GetStarted = ({navigation, setFlag}) => {
-  // const {setFlag} = route.params;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
 
   const handleContinue = () => {
-    const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
+    const emailRegex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
     if (!emailRegex.test(email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address');
       return;
     }
 
-    // navigation.navigate('AppNavigator');
     console.log('First Name:', firstName);
     console.log('Last Name:', lastName);
     console.log('Email:', email);
@@ -38,79 +38,77 @@ const GetStarted = ({navigation, setFlag}) => {
     setLastName('');
     setEmail('');
 
-    setFlag(true);
+    // if (setFlag) setFlag(true);
+          navigation.replace('WelcomeAuth');
+
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.mainContainer}>
+      <KeyboardAwareScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
+        
         <View style={styles.headerContainer}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtnWrapper}>
             <Image source={Back} style={styles.backButton} />
           </TouchableOpacity>
+          
           <Image source={Logo} style={styles.logo} />
+          
+          <View style={styles.backBtnWrapper} />
         </View>
 
         <Text style={styles.headerText}>Let's get started</Text>
 
-        <KeyboardAwareScrollView
-          contentContainerStyle={styles.scrollContainer}
-          resetScrollToCoords={{x: 0, y: 0}}
-          enableOnAndroid={true}
-          extraHeight={100}>
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>First Name</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="Enter Your First Name"
-                placeholderTextColor="#797981"
-                keyboardType="default"
-                textAlign="center"
-                value={firstName}
-                onChangeText={setFirstName}
-              />
-            </View>
+        <View style={styles.formContainer}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>First Name</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter Your First Name"
+              placeholderTextColor="#A0A0A0"
+              value={firstName}
+              onChangeText={setFirstName}
+            />
           </View>
 
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>Last Name</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="Enter Your Last Name"
-                placeholderTextColor="#797981"
-                keyboardType="default"
-                textAlign="center"
-                value={lastName}
-                onChangeText={setLastName}
-              />
-            </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Last Name</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Enter Your Last Name"
+              placeholderTextColor="#A0A0A0"
+              value={lastName}
+              onChangeText={setLastName}
+            />
           </View>
 
-          <View style={styles.nameContainer}>
-            <Text style={styles.name}>Email</Text>
-            <View style={styles.inputContainer}>
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="xyz@abc.com"
-                placeholderTextColor="#797981"
-                keyboardType="email-address"
-                textAlign="center"
-                value={email}
-                onChangeText={setEmail}
-              />
-            </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="xyz@abc.com"
+              placeholderTextColor="#A0A0A0"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
           </View>
+        </View>
 
+        <View style={styles.bottomSection}>
           <TouchableOpacity
             style={styles.continueContainer}
             onPress={handleContinue}>
             <Text style={styles.contButton}>CONTINUE</Text>
-            <Image source={Continue} style={styles.continue} />
+            <Image source={Continue} style={styles.continueIcon} />
           </TouchableOpacity>
-        </KeyboardAwareScrollView>
-      </View>
+        </View>
+
+      </KeyboardAwareScrollView>
     </SafeAreaView>
   );
 };
@@ -120,21 +118,23 @@ export default GetStarted;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  mainContainer: {
-    flex: 1,
-    justifyContent: 'start',
-    alignItems: 'start',
-    marginTop: 81,
-    width: '90%',
-    marginLeft: 20,
+  scrollContainer: {
+    flexGrow: 1, 
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 20,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    height: 50,
+    marginBottom: 30,
+  },
+  backBtnWrapper: {
+    width: 42, 
   },
   backButton: {
     width: 20,
@@ -145,75 +145,60 @@ const styles = StyleSheet.create({
     width: 42,
     height: 49,
     resizeMode: 'contain',
-    position: 'absolute',
-    left: '54%',
-    transform: [{translateX: -21}],
   },
   headerText: {
-    fontFamily: fonts.SemiBold,
-    fontSize: 36,
+    fontFamily: fonts.Bold,
+    fontSize: 32,
+    color: '#000000',
     textAlign: 'center',
-    marginTop: 30,
+    marginBottom: 40,
   },
-  nameContainer: {
-    marginTop: 40,
+  formContainer: {
     width: '100%',
-    alignItems: 'flex-start',
   },
-  name: {
+  inputGroup: {
+    marginBottom: 24,
+  },
+  label: {
+    fontFamily: fonts.Bold,
+    fontSize: 16,
     color: '#1A9FEE',
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'left',
+    marginBottom: 10,
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  textInput: {
     width: '100%',
-    height: 55,
-    borderRadius: 14,
-    paddingHorizontal: 10,
-    marginTop: 10,
+    height: 56,
     backgroundColor: '#F2F2F2',
-  },
-  inputLogo: {
-    width: 20,
-    height: 20,
-    resizeMode: 'contain',
-    marginRight: 10,
-  },
-  countryCode: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#14323A',
-    marginLeft: 20,
-  },
-  phoneInput: {
-    flex: 1,
-    fontSize: 16,
-    color: '#000',
+    borderRadius: 12,
     textAlign: 'center',
+    fontSize: 15,
+    fontFamily: fonts.Medium,
+    color: '#000',
+    paddingVertical: 0, 
+  },
+  bottomSection: {
+    marginTop: 'auto', 
+    width: '100%',
+    paddingTop: 40,
   },
   continueContainer: {
-    marginTop: 200,
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    borderWidth: 3,
-    borderColor: '#38B6FF',
-    padding: 20,
-    borderRadius: 100,
     justifyContent: 'center',
+    width: '100%',
+    height: 60,
+    borderWidth: 2,
+    borderColor: '#38B6FF',
+    borderRadius: 100,
   },
   contButton: {
-    fontFamily: fonts.SemiBold,
-
-    fontSize: 16,
+    fontFamily: fonts.Bold,
+    fontSize: 15,
     color: '#000',
-    marginRight: 5,
+    marginRight: 8,
   },
-  continue: {
-    width: 20,
+  continueIcon: {
+    width: 24,
     height: 20,
     resizeMode: 'contain',
   },

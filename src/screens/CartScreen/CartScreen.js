@@ -8,8 +8,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-
 import Back from '../../assets/welcome/backbutton.png';
 import {fonts} from './../../config/fonts';
 import CartCard from './../../components/Card/CartCard';

@@ -4,9 +4,9 @@ import {
   TextInput,
   Image,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Filter from '../../assets/filterModel/filter.png';
 import Search from '../../assets/filterModel/search.png';

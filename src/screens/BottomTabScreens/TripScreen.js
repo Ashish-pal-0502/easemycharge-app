@@ -5,8 +5,8 @@ import {
   TextInput,
   Image,
   StyleSheet,
-  SafeAreaView,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Close from '../../assets/trip/close.png';
 import NavigationStart from '../../assets/trip/navigationStart.png';

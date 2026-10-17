@@ -2,10 +2,10 @@
 
 
 import React from 'react';
-import {StyleSheet, View, SafeAreaView} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import ScreenHeader from './../../components/ScreenHeader/ScreenHeader';
 import VehicleCard from './../../components/Card/VehicleCard';
-
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Image1 from '../../assets/twoWheelerManufacturer/ather.png';
 import Image2 from '../../assets/twoWheelerManufacturer/ola.png';
 import Image3 from '../../assets/twoWheelerManufacturer/okinawa.png';

@@ -1,5 +1,7 @@
 import React from 'react';
-import {StyleSheet, View, SafeAreaView, TouchableOpacity} from 'react-native';
+import {StyleSheet, View, TouchableOpacity} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import TwoWheelerManuCard from './../../components/Card/TwoWheelerManuCard';
 import ScreenHeader from './../../components/ScreenHeader/ScreenHeader';
 
@@ -10,18 +12,7 @@ import {vehiclesByBrand} from '../../data/vehicles';
 const HeavyVehicleManufacturer = ({navigation}) => {
   const images = [{id: 1, src: Image1, name: 'TataHeavyVehicle'}];
 
-  // const handlePress = name => {
-  //   console.log(`Clicked on ${name}`);
 
-  //   switch (name) {
-  //     case 'TataHeavyVehicle':
-  //       navigation.navigate('TataHeavyVehicle');
-  //       break;
-
-  //     default:
-  //       break;
-  //   }
-  // };
 
     const handlePress = name => {
     const vehicles = vehiclesByBrand?.[name] ?? [];

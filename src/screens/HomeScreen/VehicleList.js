@@ -1,19 +1,20 @@
 
 import React from 'react';
-import {StyleSheet, View, SafeAreaView, FlatList} from 'react-native';
+import {StyleSheet, View, FlatList} from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import CarCard from '../../components/Card/CarCard';
 import ScreenHeader2 from './../../components/ScreenHeader/ScreenHeader2';
 
 const VehicleList = ({route, navigation}) => {
   const {brand = '', vehicles = []} = route.params || {};
 
-  console.log("br", brand, vehicles)
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.mainContainer}>
         <ScreenHeader2 heading={'Choose Your EV'} brand={brand} />
-        {/* Car Cards */}
+      
         <FlatList
           data={vehicles}
           renderItem={({item}) => (
@@ -38,7 +39,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'start',
     alignItems: 'center',
-    marginTop: 50,
   },
   carsContainer: {
     alignItems: 'start',

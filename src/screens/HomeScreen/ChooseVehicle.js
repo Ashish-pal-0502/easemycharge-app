@@ -3,10 +3,11 @@ import {
   Text,
   View,
   Image,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
 import React from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import Logo from '../../assets/logo/Logo.png';
 import Back from '../../assets/welcome/backbutton.png';
 import RightArrow from '../../assets/welcome/rightArrow.png';
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     alignItems: 'center',
-    marginTop: 81,
+    marginTop: 20,
   },
   headerContainer: {
     flexDirection: 'row',

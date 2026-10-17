@@ -1,3 +1,6 @@
+
+
+
 import React, {useState} from 'react';
 import {
   StyleSheet,
@@ -5,16 +8,15 @@ import {
   View,
   Image,
   TextInput,
-  SafeAreaView,
-  Alert,
   TouchableOpacity,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+
 import Logo from '../../assets/logo/Logo.png';
 import Flag from '../../assets/welcome/IndFlag.png';
 import Continue from '../../assets/welcome/continue.png';
 import Google from '../../assets/welcome/google.png';
 import {fonts} from '../../config/fonts';
-import colors from '../../config/colors';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const WelcomeAuth = ({navigation}) => {
@@ -28,63 +30,66 @@ const WelcomeAuth = ({navigation}) => {
   const handleContinue = () => {
     if (phoneNumber.length === 10) {
       setError('');
-      navigation.navigate('GetVerified'); // Navigate if phone number is valid
+      navigation.navigate('GetVerified');
     } else {
       setError('Please enter a valid 10-digit phone number');
     }
   };
 
   return (
-    <SafeAreaView style={styles.mainContainer}>
-      <View style={styles.container}>
-        <Image source={Logo} style={styles.logo} />
-        <Text style={styles.welcomeText}>
-          Welcome to {'\n'}
-          <Text style={styles.EaseMyCharge}>EaseMyCharge</Text>
-        </Text>
-      </View>
-
+    <SafeAreaView style={styles.safeArea}>
       <KeyboardAwareScrollView
         contentContainerStyle={styles.scrollContainer}
-        resetScrollToCoords={{x: 0, y: 0}}
-        enableOnAndroid={true}
-        extraHeight={100}>
-        <View style={styles.phoneContainer}>
-          <Text style={styles.phone}>Enter your phone number</Text>
-          <View style={styles.inputContainer}>
-            <Image source={Flag} style={styles.inputLogo} />
-            <Text style={styles.countryCode}>(+91)</Text>
-            <TextInput
-              style={styles.phoneInput}
-              placeholder="10 digit mobile number"
-              placeholderTextColor="#797981"
-              keyboardType="numeric"
-              maxLength={10}
-              value={phoneNumber}
-              onChangeText={handlePhoneNumberChange}
-            />
-          </View>
-          {error ? <Text style={styles.errorText}>{error}</Text> : null}
-        </View>
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled">
+        
+        <View style={styles.topSection}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.welcomeText}>
+            Welcome to{'\n'}
+            <Text style={styles.EaseMyCharge}>EaseMyCharge</Text>
+          </Text>
 
-        <TouchableOpacity
-          style={styles.continueContainer}
-          onPress={handleContinue}>
-          <Text style={styles.contButton}>CONTINUE</Text>
-          <Image source={Continue} style={styles.continue} />
-        </TouchableOpacity>
-
-        <Text style={styles.orContinue}>or continue with</Text>
-
-        <View style={styles.socialContainer}>
-          <View style={styles.iconWrapper}>
-            <Image source={Google} style={styles.socialIcon} />
+          <View style={styles.phoneContainer}>
+            <Text style={styles.phoneLabel}>Enter your phone number</Text>
+            <View style={styles.inputContainer}>
+              <Image source={Flag} style={styles.inputLogo} />
+              <Text style={styles.countryCode}>(+91)</Text>
+              <TextInput
+                style={styles.phoneInput}
+                placeholder="10 digit mobile number"
+                placeholderTextColor="#797981"
+                keyboardType="numeric"
+                maxLength={10}
+                value={phoneNumber}
+                onChangeText={handlePhoneNumberChange}
+              />
+            </View>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
           </View>
         </View>
 
-        <Text style={styles.privacyText}>
-          Privacy Policy & Terms and Conditions
-        </Text>
+        <View style={styles.bottomSection}>
+          <TouchableOpacity
+            style={styles.continueContainer}
+            onPress={handleContinue}>
+            <Text style={styles.contButton}>CONTINUE</Text>
+            <Image source={Continue} style={styles.continue} />
+          </TouchableOpacity>
+
+          <Text style={styles.orContinue}>or continue with</Text>
+
+          <View style={styles.socialContainer}>
+            <TouchableOpacity style={styles.iconWrapper}>
+              <Image source={Google} style={styles.socialIcon} />
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.privacyText}>
+            Privacy Policy & Terms and Conditions
+          </Text>
+        </View>
+
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
@@ -93,132 +98,143 @@ const WelcomeAuth = ({navigation}) => {
 export default WelcomeAuth;
 
 const styles = StyleSheet.create({
-  mainContainer: {
+  safeArea: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
-  container: {
-    justifyContent: 'center',
+  scrollContainer: {
+    flexGrow: 1, 
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 20,
+  },
+  topSection: {
     alignItems: 'center',
   },
   logo: {
-    marginTop: 81,
     width: 42,
     height: 49,
     resizeMode: 'contain',
-  },
-  EaseMyCharge: {
-    color: '#38B6FF',
+    marginBottom: 20,
   },
   welcomeText: {
     fontFamily: fonts.Bold,
     color: '#050505',
-    fontSize: 36,
+    fontSize: 34,
     textAlign: 'center',
+    lineHeight: 46,
+    marginBottom: 40,
+  },
+  EaseMyCharge: {
+    color: '#38B6FF',
   },
   phoneContainer: {
-    marginTop: 20,
-    marginLeft: 20,
-    width: '80%',
+    width: '100%',
     alignItems: 'flex-start',
   },
-  phone: {
+  phoneLabel: {
     color: '#14323A',
     fontFamily: fonts.SemiBold,
     fontSize: 16,
-    textAlign: 'left',
+    marginBottom: 10,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    height: 55,
-    borderRadius: 14,
-    marginTop: 10,
-    backgroundColor: '#F2F2F2',
+    height: 56,
+    borderRadius: 15,
+    backgroundColor: '#F2F2F2', 
+    paddingHorizontal: 16, 
   },
   inputLogo: {
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
     resizeMode: 'contain',
     marginRight: 10,
   },
   countryCode: {
     fontSize: 16,
-    fontWeight: '500',
-    color: '#14323A',
-    marginLeft: 20,
+    fontFamily: fonts.Medium,
+    color: '#000',
+    marginRight: 10,
   },
   phoneInput: {
     flex: 1,
     fontSize: 16,
+    fontFamily: fonts.Medium,
     color: '#000',
-  },
-  continueContainer: {
-    marginTop: 260,
-    marginLeft: 15,
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '93%',
-    borderWidth: 3,
-    borderColor: '#38B6FF',
-    padding: 20,
-    borderRadius: 100,
-    justifyContent: 'center',
-  },
-  contButton: {
-    fontFamily: fonts.SemiBold,
-    fontSize: 16,
-    color: '#000',
-    marginRight: 5,
-  },
-  continue: {
-    width: 25,
-    height: 20,
-    resizeMode: 'contain',
-  },
-  orContinue: {
-    marginTop: 20,
-    fontWeight: 700,
-    fontSize: 16,
-    color: '#817777',
-    textAlign: 'center',
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 20,
-    justifyContent: 'center',
-    gap: 20,
-  },
-  iconWrapper: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
-    shadowOpacity: 1,
-    shadowRadius: 1,
-    elevation: 8,
-    marginHorizontal: 10,
-  },
-  socialIcon: {
-    width: 30,
-    height: 30,
-    resizeMode: 'contain',
-  },
-  privacyText: {
-    fontFamily: fonts.SemiBold,
-    marginTop: 20,
-    fontSize: 20,
-    color: colors.primary,
-    textAlign: 'center',
+    paddingVertical: 0, 
   },
   errorText: {
     color: 'red',
     fontSize: 12,
-    marginTop: 5,
+    fontFamily: fonts.Medium,
+    marginTop: 8,
+  },
+  bottomSection: {
+    marginTop: 'auto', 
+    alignItems: 'center',
+    width: '100%',
+  },
+  continueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: 60,
+    borderWidth: 2,
+    borderColor: '#38B6FF',
+    borderRadius: 100,
+    marginBottom: 30,
+  },
+  contButton: {
+    fontFamily: fonts.Bold,
+    fontSize: 15,
+    color: '#000',
+    marginRight: 8,
+  },
+  continue: {
+    width: 24,
+    height: 20,
+    resizeMode: 'contain',
+  },
+  orContinue: {
+    fontFamily: fonts.Medium,
+    fontSize: 14,
+    color: '#797981',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  socialContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 40,
+  },
+  iconWrapper: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    // iOS Shadow
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    // Android Shadow
+    elevation: 3,
+  },
+  socialIcon: {
+    width: 26,
+    height: 26,
+    resizeMode: 'contain',
+  },
+  privacyText: {
+    fontFamily: fonts.Bold,
+    fontSize: 14,
+    color: '#38B6FF',
+    textAlign: 'center',
   },
 });

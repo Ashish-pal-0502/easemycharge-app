@@ -41,7 +41,7 @@ export default ScreenHeader;
 const styles = StyleSheet.create({
   mainContainer: {
     alignItems: 'center',
-    marginTop: 85,
+    marginTop: 20,
   },
   headerContainer: {
     flexDirection: 'row',

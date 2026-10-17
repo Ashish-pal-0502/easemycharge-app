@@ -3,9 +3,10 @@ import {
   Text,
   View,
   Image,
-  SafeAreaView,
   TouchableOpacity,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 import Back from '../../assets/welcome/backbutton.png';
 import UserImage from '../../assets/user/user.png';
 import Icon1 from '../../assets/user/charging.png';
