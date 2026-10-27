@@ -1,96 +1,225 @@
 
 
-
-import React, {useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
+  Image,
   StyleSheet,
   Text,
-  View,
-  Image,
   TextInput,
   TouchableOpacity,
+  View,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import auth, {
+  getAuth,
+  signInWithCredential,
+} from '@react-native-firebase/auth';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import Config from 'react-native-config';
 
 import Logo from '../../assets/logo/Logo.png';
 import Flag from '../../assets/welcome/IndFlag.png';
-import Continue from '../../assets/welcome/continue.png';
 import Google from '../../assets/welcome/google.png';
-import {fonts} from '../../config/fonts';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import Continue from '../../assets/welcome/continue.png'; 
+import { fonts } from '../../config/fonts';
+import apiClient from './../../api/client';
+import useAuth from './../../auth/useAuth';
 
-const WelcomeAuth = ({navigation}) => {
+const WelcomeAuth = ({ navigation }) => {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const { logIn } = useAuth();
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId:
+        Config.GOOGLE_WEB_CLIENT_ID ||
+        '230938242454-k44itfe5434sv4trvlnvgiv4arnp16gi.apps.googleusercontent.com',
+    });
+  }, []);
 
   const handlePhoneNumberChange = text => {
-    setPhoneNumber(text);
+    const digits = text.replace(/[^0-9]/g, '');
+    setPhoneNumber(digits);
   };
 
-  const handleContinue = () => {
-    if (phoneNumber.length === 10) {
-      setError('');
-      navigation.navigate('GetVerified');
-    } else {
+  const handleContinue = async () => {
+    if (phoneNumber.length !== 10) {
       setError('Please enter a valid 10-digit phone number');
+      return;
+    }
+
+    setError('');
+    setLoading(true);
+
+    const e164Phone = `+91${phoneNumber}`;
+
+    try {
+      const res = await apiClient.post('/auth/otp/request', {
+        phone: e164Phone,
+      });
+
+      if (!res.ok) {
+        setError(
+          res.data?.message || 'Could not send OTP. Please try again.',
+        );
+        return;
+      }
+
+      navigation.navigate('GetVerified', { phone: e164Phone });
+    } catch (e) {
+      setError('Network error. Check your connection and try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      setGoogleLoading(true);
+      setError('');
+
+      await GoogleSignin.hasPlayServices({
+        showPlayServicesUpdateDialog: true,
+      });
+
+      await GoogleSignin.signOut();
+
+      const signInResult = await GoogleSignin.signIn();
+
+      const googleIdToken =
+        signInResult.data?.idToken || signInResult.idToken || null;
+
+      if (!googleIdToken) throw new Error('No ID token found');
+
+      const googleCredential = auth.GoogleAuthProvider.credential(googleIdToken);
+      const userCredential = await signInWithCredential(
+        getAuth(),
+        googleCredential,
+      );
+      const firebaseIdToken = await userCredential.user.getIdToken();
+
+      const res = await apiClient.post('/auth/firebase', {
+        idToken: firebaseIdToken,
+      });
+
+      if (!res.ok) {
+        setError(res.data?.message || 'Google login failed');
+        return;
+      }
+
+      const { accessToken, refreshToken } = res.data.data;
+      await logIn(accessToken, refreshToken);
+    } catch (err) {
+      console.error('Google login failed:', err);
+      if (err?.code === 'SIGN_IN_CANCELLED' || err?.code === '12501') {
+        return;
+      }
+      setError('Google login failed. Please try again.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
+  const disabled = loading || phoneNumber.length !== 10;
+
   return (
     <SafeAreaView style={styles.safeArea}>
-      <KeyboardAwareScrollView
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled">
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         
+        {/* Top Section: Logo & Welcome */}
         <View style={styles.topSection}>
           <Image source={Logo} style={styles.logo} />
           <Text style={styles.welcomeText}>
             Welcome to{'\n'}
-            <Text style={styles.EaseMyCharge}>EaseMyCharge</Text>
+            <Text style={styles.brandName}>EaseMyCharge</Text>
           </Text>
-
-          <View style={styles.phoneContainer}>
-            <Text style={styles.phoneLabel}>Enter your phone number</Text>
-            <View style={styles.inputContainer}>
-              <Image source={Flag} style={styles.inputLogo} />
-              <Text style={styles.countryCode}>(+91)</Text>
-              <TextInput
-                style={styles.phoneInput}
-                placeholder="10 digit mobile number"
-                placeholderTextColor="#797981"
-                keyboardType="numeric"
-                maxLength={10}
-                value={phoneNumber}
-                onChangeText={handlePhoneNumberChange}
-              />
-            </View>
-            {error ? <Text style={styles.errorText}>{error}</Text> : null}
-          </View>
         </View>
 
-        <View style={styles.bottomSection}>
+        {/* Middle Section: Inputs */}
+        <View style={styles.middleSection}>
+          <Text style={styles.phoneLabel}>Enter your phone number</Text>
+          
+          <View style={[styles.inputContainer, error ? styles.inputError : null]}>
+            <Image source={Flag} style={styles.inputLogo} />
+            <Text style={styles.countryCode}>+91</Text>
+            <TextInput
+              style={styles.phoneInput}
+              placeholder="98765 43210"
+              placeholderTextColor="#A0A5B5"
+              keyboardType="numeric"
+              maxLength={10}
+              value={phoneNumber}
+              onChangeText={handlePhoneNumberChange}
+              editable={!loading && !googleLoading}
+            />
+          </View>
+          
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          {/* --- YOUR CUSTOM CONTINUE BUTTON --- */}
           <TouchableOpacity
-            style={styles.continueContainer}
-            onPress={handleContinue}>
-            <Text style={styles.contButton}>CONTINUE</Text>
-            <Image source={Continue} style={styles.continue} />
+            style={[
+              styles.continueContainer, 
+              disabled && styles.continueContainerDisabled // Apply disabled style
+            ]}
+            onPress={handleContinue}
+            disabled={disabled}
+            activeOpacity={0.7}>
+            {loading ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <>
+                <Text style={[styles.contButton, disabled && styles.textDisabled]}>
+                  CONTINUE
+                </Text>
+                <Image 
+                  source={Continue} 
+                  style={[styles.continueIcon, disabled && { opacity: 0.4 }]} 
+                />
+              </>
+            )}
+          </TouchableOpacity>
+        </View>
+
+        {/* Bottom Section: Social Login & Footer */}
+        <View style={styles.bottomSection}>
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>or continue with</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.googleButton}
+            onPress={handleGoogleLogin}
+            disabled={googleLoading}
+            activeOpacity={0.8}>
+            {googleLoading ? (
+              <ActivityIndicator color="#38B6FF" />
+            ) : (
+              <>
+                <Image source={Google} style={styles.googleIcon} />
+                <Text style={styles.googleText}>Google</Text>
+              </>
+            )}
           </TouchableOpacity>
 
-          <Text style={styles.orContinue}>or continue with</Text>
-
-          <View style={styles.socialContainer}>
-            <TouchableOpacity style={styles.iconWrapper}>
-              <Image source={Google} style={styles.socialIcon} />
-            </TouchableOpacity>
-          </View>
-
           <Text style={styles.privacyText}>
-            Privacy Policy & Terms and Conditions
+            By continuing, you agree to our{'\n'}
+            <Text style={styles.linkText}>Privacy Policy & Terms of Service</Text>
           </Text>
         </View>
 
-      </KeyboardAwareScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -102,81 +231,90 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
-  scrollContainer: {
-    flexGrow: 1, 
+  container: {
+    flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 10,
+    justifyContent: 'space-between', 
+    paddingTop: 40,
     paddingBottom: 20,
   },
   topSection: {
     alignItems: 'center',
+    marginTop: 20,
   },
   logo: {
-    width: 42,
-    height: 49,
+    width: 56,
+    height: 56,
     resizeMode: 'contain',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   welcomeText: {
-    fontFamily: fonts.Bold,
-    color: '#050505',
-    fontSize: 34,
+    fontFamily: fonts.Medium,
+    fontSize: 24,
+    color: '#666',
     textAlign: 'center',
-    lineHeight: 46,
-    marginBottom: 40,
+    lineHeight: 46, 
   },
-  EaseMyCharge: {
-    color: '#38B6FF',
+  brandName: {
+    fontFamily: fonts.Bold,
+    fontSize: 36,
+    color: '#000000',
   },
-  phoneContainer: {
+  middleSection: {
+    marginTop: 40,
     width: '100%',
-    alignItems: 'flex-start',
   },
   phoneLabel: {
-    color: '#14323A',
     fontFamily: fonts.SemiBold,
-    fontSize: 16,
-    marginBottom: 10,
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 12,
+    marginLeft: 4,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    width: '100%',
-    height: 56,
-    borderRadius: 15,
-    backgroundColor: '#F2F2F2', 
-    paddingHorizontal: 16, 
+    backgroundColor: '#F7F9FC',
+    borderWidth: 1.5,
+    borderColor: '#E5EAF0',
+    borderRadius: 16,
+    height: 60,
+    paddingHorizontal: 16,
+  },
+  inputError: {
+    borderColor: '#FF5A5F',
   },
   inputLogo: {
     width: 24,
     height: 24,
     resizeMode: 'contain',
-    marginRight: 10,
+    marginRight: 12,
   },
   countryCode: {
+    fontFamily: fonts.SemiBold,
     fontSize: 16,
-    fontFamily: fonts.Medium,
     color: '#000',
-    marginRight: 10,
+    marginRight: 12,
+    paddingRight: 12,
+    borderRightWidth: 1,
+    borderRightColor: '#E5EAF0',
   },
   phoneInput: {
     flex: 1,
-    fontSize: 16,
-    fontFamily: fonts.Medium,
+    fontFamily: fonts.SemiBold,
+    fontSize: 18,
     color: '#000',
-    paddingVertical: 0, 
+    paddingVertical: 0,
   },
   errorText: {
-    color: 'red',
-    fontSize: 12,
     fontFamily: fonts.Medium,
-    marginTop: 8,
+    color: '#FF5A5F',
+    fontSize: 13,
+    marginTop: 10,
+    marginLeft: 4,
   },
-  bottomSection: {
-    marginTop: 'auto', 
-    alignItems: 'center',
-    width: '100%',
-  },
+  
+  // --- YOUR CUSTOM CONTINUE BUTTON STYLES ---
   continueContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -185,8 +323,13 @@ const styles = StyleSheet.create({
     height: 60,
     borderWidth: 2,
     borderColor: '#38B6FF',
-    borderRadius: 100,
-    marginBottom: 30,
+    borderRadius: 100, // Fully rounded pills as per your design
+    marginTop: 24,
+    backgroundColor: '#FFFFFF',
+  },
+  continueContainerDisabled: {
+    borderColor: '#D3EAF7', // Light grey/blue when disabled
+    backgroundColor: '#FAFAFA',
   },
   contButton: {
     fontFamily: fonts.Bold,
@@ -194,47 +337,68 @@ const styles = StyleSheet.create({
     color: '#000',
     marginRight: 8,
   },
-  continue: {
+  textDisabled: {
+    color: '#A0A5B5', // Faded text when disabled
+  },
+  continueIcon: {
     width: 24,
     height: 20,
     resizeMode: 'contain',
   },
-  orContinue: {
-    fontFamily: fonts.Medium,
-    fontSize: 14,
-    color: '#797981',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  socialContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginBottom: 40,
-  },
-  iconWrapper: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
+
+  bottomSection: {
     alignItems: 'center',
-    // iOS Shadow
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    // Android Shadow
-    elevation: 3,
+    marginBottom: 10,
   },
-  socialIcon: {
-    width: 26,
-    height: 26,
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 24,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E5EAF0',
+  },
+  dividerText: {
+    fontFamily: fonts.Medium,
+    color: '#A0A5B5',
+    fontSize: 14,
+    marginHorizontal: 16,
+  },
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: 60,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: '#E5EAF0',
+    backgroundColor: '#FFFFFF',
+    marginBottom: 30,
+  },
+  googleIcon: {
+    width: 24,
+    height: 24,
     resizeMode: 'contain',
+    marginRight: 12,
+  },
+  googleText: {
+    fontFamily: fonts.SemiBold,
+    fontSize: 16,
+    color: '#333',
   },
   privacyText: {
-    fontFamily: fonts.Bold,
-    fontSize: 14,
-    color: '#38B6FF',
+    fontFamily: fonts.Medium,
+    fontSize: 13,
+    color: '#A0A5B5',
     textAlign: 'center',
+    lineHeight: 20,
+  },
+  linkText: {
+    color: '#38B6FF',
+    fontFamily: fonts.Bold,
   },
 });

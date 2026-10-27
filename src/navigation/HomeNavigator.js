@@ -2,6 +2,10 @@ import { View } from 'react-native';
 import 'react-native-gesture-handler';
 
 import { createStackNavigator } from '@react-navigation/stack';
+import AddChargerScreen from './../screens/ChargerScreen/AddChargerScreen';
+import ChargerActionScreen from './../screens/ChargerScreen/ChargerActionScreen';
+import ChargerDetailsScreen from './../screens/ChargerScreen/ChargerDetailsScreen';
+import ViewChargerScreen from './../screens/ChargerScreen/ViewChargerScreen';
 import ChooseVehicle from './../screens/HomeScreen/ChooseVehicle';
 import ChooseVehicleBrand from './../screens/HomeScreen/ChooseVehicleBrand';
 import HeavyVehicleManufacturer from './../screens/HomeScreen/HeavyVehicleManufacturer';
@@ -9,10 +13,6 @@ import Manufacturer from './../screens/HomeScreen/Manufacturer';
 import ThreeWheelerManufacturer from './../screens/HomeScreen/ThreeWheelerManufacturer';
 import TwoWheelerManufacturer from './../screens/HomeScreen/TwoWheelerManufacturer';
 import VehicleList from './../screens/HomeScreen/VehicleList';
-import OnboardingScreen from './../screens/OnboardingScreen/OnboardingScreen';
-import GetStarted from './../screens/AuthScreen/GetStarted';
-import WelcomeAuth from './../screens/AuthScreen/WelcomeAuth';
-import GetVerified from './../screens/AuthScreen/GetVerified';
 const Stack = createStackNavigator();
 
 const HomeNavigator = () => {
@@ -23,30 +23,15 @@ const HomeNavigator = () => {
           flex: 1,
           backgroundColor: '#FFFFFF',
         }}>
-        <Stack.Navigator initialRouteName="OnboardingScreen">
+        <Stack.Navigator initialRouteName="ChargerAction">
 
-           <Stack.Screen
-            name="OnboardingScreen"
-            component={OnboardingScreen}
-            options={{headerShown: false}}
-          />
+          <Stack.Screen name="ChargerAction" component={ChargerActionScreen}   options={{headerShown: false}} />
+<Stack.Screen name="AddCharger"   component={AddChargerScreen}   options={{headerShown: false}} />
+<Stack.Screen name="ViewCharger"  component={ViewChargerScreen}   options={{headerShown: false}} />
+<Stack.Screen name="ChargerDetail"  component={ChargerDetailsScreen}   options={{headerShown: false}} />
+      
 
-          <Stack.Screen
-            name="GetStarted"
-            component={GetStarted}
-            options={{headerShown: false}}
-          />
-            <Stack.Screen
-            name="WelcomeAuth"
-            component={WelcomeAuth}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="GetVerified"
-            component={GetVerified}
-            options={{headerShown: false}}
-          />
-    
+        
           <Stack.Screen
             name="ChooseVehicle"
             component={ChooseVehicle}
@@ -83,7 +68,8 @@ const HomeNavigator = () => {
   component={VehicleList}
   options={{headerShown: false}}
 />
-      
+
+
         </Stack.Navigator>
       </View>
     </>

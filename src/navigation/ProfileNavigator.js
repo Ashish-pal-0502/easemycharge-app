@@ -1,15 +1,12 @@
+import { View } from 'react-native';
 import 'react-native-gesture-handler';
-import {View} from 'react-native';
-
-import {createStackNavigator} from '@react-navigation/stack';
-import CartScreen from './../screens/CartScreen/CartScreen';
-import PhoneVerify1 from './../screens/Checkout/PhoneVerify1';
-import PhoneVerify2 from './../screens/Checkout/PhoneVerify2';
-import AddressVerify1 from './../screens/Checkout/AddressVerify1';
-import AddressVerify2 from './../screens/Checkout/AddressVerify2';
-import PaymentVerify from './../screens/Checkout/PaymentVerify';
-import MarketPlaceScreen from './../screens/BottomTabScreens/MarketPlaceScreen';
+import { createStackNavigator } from '@react-navigation/stack';
 import ProfileScreen from '../screens/ProfileScreen/ProfileScreen';
+import BookingDetailsScreen from './../screens/MyBookings/BookingDetailScreen';
+import MyBookingScreen from './../screens/MyBookings/MyBookingScreen';
+import EditProfileScreen from './../screens/ProfileScreen/EditProfileScreen';
+import HelpSupportScreen from './../screens/UtilityScreens/HelpSupportScreen';
+import PrivacyPolicyScreen from './../screens/UtilityScreens/PrivacyPolicyScreen';
 const Stack = createStackNavigator();
 
 const ProfileNavigator = () => {
@@ -26,6 +23,33 @@ const ProfileNavigator = () => {
             component={ProfileScreen}
             options={{headerShown: false}}
           />
+          <Stack.Screen
+            name="MyBookingScreen"
+            component={MyBookingScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="BookingDetails"
+            component={BookingDetailsScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="HelpSupportScreen"
+            component={HelpSupportScreen}
+            options={{headerShown: false}}
+          />
+          <Stack.Screen
+            name="PrivacyPolicyScreen"
+            component={PrivacyPolicyScreen}
+            options={{headerShown: false}}
+          />
+           <Stack.Screen
+          name="EditProfileScreen"
+          component={EditProfileScreen}
+          options={{headerShown: false}} 
+        />
+
+
       
         </Stack.Navigator>
       </View>

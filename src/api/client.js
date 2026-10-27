@@ -5,9 +5,9 @@ import { userSetter } from '../auth/context';
 import { Toast } from 'toastify-react-native';
 
 const apiClient = create({
-  baseURL: 'https://backend.doera.ai/api',
+  // baseURL: 'https://backend.doera.ai/api',
   // baseURL: 'http://192.168.31.106:5000/api', //local backend
-  // baseURL: 'http://3.109.182.128:5000/api', // testing url
+  baseURL: 'http://10.70.253.1:5000/api', // testing url
   headers: { Accept: 'application/vnd.github.v3+json' },
 });
 
@@ -15,7 +15,8 @@ apiClient.addAsyncRequestTransform(async request => {
   const token = await authStorage.getAccessToken();
   if (!token) return;
 
-  request.headers['x-auth-token'] = token;
+  // request.headers['x-auth-token'] = token;
+   request.headers['Authorization'] = `Bearer ${token}`;
 });
 
 /* Refresh token interceptor */
@@ -36,6 +37,13 @@ apiClient.axiosInstance.interceptors.response.use(
       userSetter.setUser(null);
       return Promise.reject(error);
     }
+
+    const isRefreshRoute = originalRequest?.url?.includes('/auth/refresh');
+
+if (isRefreshRoute) {
+    return Promise.reject(error);
+}
+
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
@@ -61,7 +69,7 @@ apiClient.axiosInstance.interceptors.response.use(
         }
 
         const refreshResponse = await apiClient.post(
-          '/user/refresh-tokens',
+          '/auth/refresh',
           {},
           {
             headers: {
@@ -71,22 +79,32 @@ apiClient.axiosInstance.interceptors.response.use(
         );
 
         console.log('renewed', refreshResponse)
+        const accessToken = refreshResponse.data?.data?.accessToken;
+const newRefreshToken = refreshResponse.data?.data?.refreshToken;
 
-        if (
-          refreshResponse.status === 200 &&
-          refreshResponse.data?.accessToken
-        ) {
-          const { accessToken, refreshToken: newRefreshToken } =
-            refreshResponse.data;
+if (refreshResponse.ok && accessToken) {
+  await authStorage.storeTokens(accessToken, newRefreshToken || refreshToken);
+  originalRequest.headers['Authorization'] = `Bearer ${accessToken}`;
+  return apiClient.axiosInstance(originalRequest);
+}
 
-          await authStorage.storeTokens(
-            accessToken,
-            newRefreshToken || refreshToken,
-          );
+        // if (
+        //   refreshResponse.status === 200 &&
+        //   refreshResponse.data?.accessToken
+        // ) {
+        //   const { accessToken, refreshToken: newRefreshToken } =
+        //     refreshResponse.data;
 
-          originalRequest.headers['x-auth-token'] = accessToken;
-          return apiClient.axiosInstance(originalRequest);
-        } else {
+        //   await authStorage.storeTokens(
+        //     accessToken,
+        //     newRefreshToken || refreshToken,
+        //   );
+
+        //   originalRequest.headers['x-auth-token'] = accessToken;
+        //   return apiClient.axiosInstance(originalRequest);
+        // }
+        
+        else {
           console.log(' Refresh failed - invalid response');
           await cache.clear('userDetails');
           await authStorage.removeTokens();

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "230938242454",
+    "project_id": "easemychargeapp",
+    "storage_bucket": "easemychargeapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:230938242454:android:00587653d7346a9ed041b7",
+        "android_client_info": {
+          "package_name": "com.easemycharge"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "230938242454-ia5q2aso8bebeg03qv97h7gbfqlgporr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.easemycharge",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "230938242454-k44itfe5434sv4trvlnvgiv4arnp16gi.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCbgK3pEvMs45y1ge-H7KnL6A09Iy00ack"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "230938242454-k44itfe5434sv4trvlnvgiv4arnp16gi.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,10 +1,9 @@
 import { View } from 'react-native';
 import 'react-native-gesture-handler';
-
 import { createStackNavigator } from '@react-navigation/stack';
-import WelcomeAuth from './../screens/AuthScreen/WelcomeAuth';
 import GetStarted from './../screens/AuthScreen/GetStarted';
 import GetVerified from './../screens/AuthScreen/GetVerified';
+import WelcomeAuth from './../screens/AuthScreen/WelcomeAuth';
 const Stack = createStackNavigator();
 
 const AuthNavigator = () => {
@@ -16,14 +15,10 @@ const AuthNavigator = () => {
           backgroundColor: '#FFFFFF',
         }}>
         <Stack.Navigator initialRouteName="WelcomeAuth">
+
           <Stack.Screen
             name="WelcomeAuth"
             component={WelcomeAuth}
-            options={{headerShown: false}}
-          />
-          <Stack.Screen
-            name="GetStarted"
-            component={GetStarted}
             options={{headerShown: false}}
           />
           <Stack.Screen
@@ -31,7 +26,11 @@ const AuthNavigator = () => {
             component={GetVerified}
             options={{headerShown: false}}
           />
-      
+          <Stack.Screen
+            name="GetStarted"
+            component={GetStarted}
+            options={{headerShown: false}}
+          />
         </Stack.Navigator>
       </View>
     </>
